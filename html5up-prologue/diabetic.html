@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Attention-Based Modules for Diabetic Retinopathy Diagnosis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-left: 3px solid #ddd;
+            overflow-x: auto;
+        }
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Attention-Based Modules for Diabetic Retinopathy Diagnosis</h1>
+    </header>
+
+    <section>
+        <h2>Introduction</h2>
+        <p>Diabetic Retinopathy (DR) is one of the leading causes of blindness, and its early detection is critical to managing the progression of diabetes and avoiding severe complications. Computational approaches, especially based on fundus imaging, have shown great promise in diagnosing DR with high precision and speed.</p>
+        <p>In this project, we focus on improving DR diagnosis using attention-based modules in a semantic segmentation architecture,
+             primarily a U-Net model. We integrate several attention mechanisms—Attention Gait (AG), Multihead Attention (MHA), 
+             Convolutional Block Attention (CBAM), and Squeeze Excitation (SE)—to enhance lesion detection (such as hemorrhages 
+             and microaneurysms) and improve classification performance. Our experiments are conducted on multiple datasets, 
+             including IDRID, FGADR, EyePacs, and APTOS.  You can find the code <a href="https://github.com/GriselQ23/diabetic-retinopathy-detection " download style="color: blue;">here</a></p></p>
+    </section>
+
+    <section>
+        <h2>Dataset Overview</h2>
+        <p>The datasets used in this project provide labeled fundus images, indicating varying degrees of Diabetic Retinopathy. These datasets include:</p>
+        <ul>
+            <li><strong>IDRID:</strong> Indian Diabetic Retinopathy Image Dataset, annotated with various lesion types such as hemorrhages, exudates, and microaneurysms.</li>
+            <li><strong>FGADR:</strong> Fundus Grading and Annotation for Diabetic Retinopathy, designed for DR lesion detection.</li>
+            <li><strong>EyePacs:</strong> A widely used dataset for binary classification of DR presence or absence.</li>
+            <li><strong>APTOS:</strong> Dataset from the Asia Pacific Tele-Ophthalmology Society challenge, consisting of DR-graded fundus images.</li>
+        </ul>
+        <p>These datasets provide a wide range of images necessary for training and validating the models for both lesion detection and classification.</p>
+    </section>
+
+    <section>
+        <h2>1. Semantic Segmentation and Attention-Based Models</h2>
+        <p>In this project, we enhanced a U-Net-based semantic segmentation model by integrating different attention modules. These modules aim to focus on critical regions of the fundus images where DR-related lesions are present. Below is a brief overview of each module used:</p>
+
+        <h3>Attention Modules:</h3>
+        <ul>
+            <li><strong>Attention Gait (AG):</strong> A module designed to prioritize spatial locations in the image by focusing attention on critical lesion areas.</li>
+            <li><strong>Multihead Attention (MHA):</strong> Derived from Transformer models, MHA allows the model to focus on different lesion-related features simultaneously.</li>
+            <li><strong>Convolutional Block Attention (CBAM):</strong> This module combines spatial and channel-wise attention, focusing on both where and what features to emphasize.</li>
+            <li><strong>Squeeze Excitation (SE):</strong> A mechanism that recalibrates channel-wise features by focusing on their importance for lesion detection.</li>
+        </ul>
+    </section>
+    <section>
+        <h2>EyePACS Dataset Preprocessing Summary</h2>
+        
+        <p>The preprocessing of the EyePACS dataset involved multiple stages to enhance image quality and diversify the data through augmentation. The key steps are summarized below:</p>
+
+        <h3>1. Random Image Display</h3>
+        <p>A function was developed to visualize random images from the dataset. This allowed for inspection of data loading and visualization before applying augmentations.</p>
+        <pre><code>
+        def plot_random_image(folder_path):
+            image_list = [filename for filename in os.listdir(folder_path) if filename.endswith('.jpeg')]
+            random_image = random.choice(image_list)
+            image_path = os.path.join(folder_path, random_image)
+            image = cv2.imread(image_path)
+            image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+            plt.imshow(image_rgb)
+            plt.axis('off')
+            plt.show()
+        </code></pre>
+
+        <h3>2. Image Augmentation Techniques</h3>
+        <p>To increase the diversity of the dataset, several augmentation techniques were applied:</p>
+        <ul>
+            <li>Gaussian Blur</li>
+            <li>Gamma Contrast Adjustment</li>
+            <li>Image Sharpening</li>
+            <li>Horizontal Flipping</li>
+            <li>Rotation (-25° to 25°)</li>
+        </ul>
+        <p>Example of applying Gaussian Blur:</p>
+        <pre><code>
+        aug = iaa.GaussianBlur(sigma=(0.0, 1.0))
+        image_aug = aug(image=image)
+        ia.imshow(image_aug)
+        </code></pre>
+
+        <h3>3. CLAHE (Contrast Limited Adaptive Histogram Equalization)</h3>
+        <p>CLAHE was used to improve image contrast, especially for underexposed images.</p>
+        <pre><code>
+        def aplicar_filtro_clahe(imagen):
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+            imagen_clahe = clahe.apply(imagen)
+            return imagen_clahe
+        </code></pre>
+
+        <h3>4. Data Augmentation for Bright Images</h3>
+        <p>A check was implemented to avoid augmenting images with low brightness. If the image brightness exceeded a threshold, augmentations like color multiplication, blur, and sharpening were applied.</p>
+        <pre><code>
+        brightness_threshold = 84
+        if brightness &gt; brightness_threshold:
+            augmented_image = augmenter.augment_image(image)
+        </code></pre>
+
+        <h3>5. SNR (Signal-to-Noise Ratio) Analysis</h3>
+        <p>The Signal-to-Noise Ratio (SNR) was calculated for each image. Based on the SNR value, images were either included for augmentation or excluded if they had too much noise.</p>
+        <pre><code>
+        snr = 20 * np.log10(mean / std_dev)
+        if snr &gt;= threshold:
+            # Proceed with augmentation
+        </code></pre>
+
+        <h3>6. Blurring Index</h3>
+        <p>The blurring index was computed using the Laplacian variance to determine the focus quality of images.</p>
+        <pre><code>
+        estimator_operator = cv2.Laplacian(image, cv2.CV_64F).var()
+        blurring_index = estimator_operator / std_deviation
+        </code></pre>
+        <img src="images/image15.PNG" alt="Feature Importance Plot" width="600">
+    </section>
+    <section>
+        <h2>IDRiD Dataset Preprocessing Summary</h2>
+    
+        <p>The preprocessing for the IDRiD dataset included a U-Net model with the CBAM (Convolutional Block Attention Module) for segmentation tasks. Below is a summary of the key steps:</p>
+    
+        <h3>1. U-Net Model Architecture</h3>
+        <p>The U-Net architecture consists of an encoder-decoder structure:</p>
+        <ul>
+            <li>**Encoder:** Series of convolutional layers with max-pooling for down-sampling.</li>
+            <li>**Bottleneck:** Middle section with higher number of filters for feature extraction.</li>
+            <li>**Decoder:** Up-sampling and concatenation of features from the encoder with skip connections.</li>
+            <li>**Output:** Final layer with a sigmoid activation function for segmentation.</li>
+        </ul>
+        <pre><code>
+        def unet_model(input_shape, num_classes):
+            inputs = Input(input_shape)
+            conv1 = Conv2D(64, 3, activation='relu', padding='same')(inputs)
+            pool1 = MaxPooling2D(pool_size=(2, 2))(conv1)
+            ...
+            outputs = Conv2D(num_classes, 1, activation='sigmoid')(conv9)
+            model = Model(inputs=inputs, outputs=outputs)
+            return model
+        </code></pre>
+    
+        <h3>2. CBAM (Convolutional Block Attention Module)</h3>
+        <p>CBAM was integrated into the U-Net to improve feature selection by applying attention mechanisms both spatially and across channels.</p>
+        <ul>
+            <li>**Spatial Attention:** Focuses on important areas within the image.</li>
+            <li>**Channel Attention:** Highlights important feature maps (channels).</li>
+        </ul>
+        <pre><code>
+        def cbam_block(inputs, ratio=8):
+            channels = inputs.shape[-1]
+            spatial_max = tf.reduce_max(inputs, axis=[1, 2], keepdims=True)
+            ...
+            return layers.Add()([spatial_attention, channel_attention])
+        </code></pre>
+    
+        <h3>3. Data Loading and Preprocessing</h3>
+        <p>Images and corresponding masks were loaded and resized. The images were normalized, and a single channel was added to handle grayscale images.</p>
+        <pre><code>
+        def load_images_and_masks(image_filenames, mask_dir, input_shape):
+            images = []
+            masks = []
+            for image_filename in image_filenames:
+                image_path = os.path.join(image_dir, image_filename)
+                image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+                ...
+            return np.array(images), masks
+        </code></pre>
+    
+        <h3>4. Model Compilation and Training</h3>
+        <p>The U-Net model with CBAM was compiled using the Adam optimizer and sparse categorical cross-entropy loss. The model was trained using an 80/20 split for training and validation data.</p>
+        <pre><code>
+        model.compile(optimizer=Adam(learning_rate=1e-4),
+                      loss='sparse_categorical_crossentropy',
+                      metrics=[mean_iou, mean_iou_thresholded()])
+        </code></pre>
+    
+        <h3>5. Custom Metrics: Mean IoU</h3>
+        <p>Custom metrics were implemented to calculate the Intersection over Union (IoU), a crucial metric for segmentation tasks.</p>
+        <pre><code>
+        def mean_iou(y_true, y_pred):
+            y_pred = K.argmax(y_pred, axis=-1)
+            ...
+            return K.mean(iou)
+        </code></pre>
+
+        <table>
+            <tr>
+                <td><img src="images/image16.png" alt="Image 1" style="max-width:70%; height:auto;"></td>
+                <td><img src="images/image17.png" alt="Image 2" style="max-width:70%; height:auto;"></td>
+                <td><img src="images/image18.png" alt="Image 2" style="max-width:70%; height:auto;"></td>
+            </tr>
+        </table>
+    </section>

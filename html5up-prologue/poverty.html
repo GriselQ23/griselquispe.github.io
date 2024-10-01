@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poverty Prediction Using Satellite Imagery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        code {
+            background-color: #f9f9f9;
+            padding: 5px;
+            display: block;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .tech-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .tech-list li {
+            background-color: #e7f3ff;
+            padding: 5px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Poverty Prediction in Bolivia Using Satellite Imagery</h1>
+    <p>This project involves developing a deep learning model to predict poverty levels in Bolivia based on satellite images. 
+        The project uses multiple scripts to train and evaluate the model, including a ResNet-50 architecture for image 
+        classification. You can find the full code <a href="https://github.com/GriselQ23/Poverty_Bolivia_prediction/" style="color: blue;" target="_blank">here</a></p>.
+
+
+    <div class="section">
+        <h2>1. Model Training and Architecture</h2>
+        <p>The model is trained on satellite imagery using the ResNet-50 architecture, which has been pre-trained on the ImageNet dataset. Training and validation datasets are processed with data augmentation techniques to improve model robustness.</p>
+
+        <ul class="tech-list">
+            <li><strong>Technologies:</strong></li>
+            <li><strong>TensorFlow/Keras:</strong> Used for building and training the ResNet-50 model.</li>
+            <li><strong>Google Colab:</strong> Environment for prototyping the model.</li>
+            <li><strong>ImageDataGenerator:</strong> For data augmentation during training.</li>
+        </ul>
+
+        <code>
+            width_shape = 224<br>
+            height_shape = 224<br>
+            train_datagen = ImageDataGenerator(  
+            rotation_range=20,<br>
+            zoom_range=0.2,<br>
+            width_shift_range=0.1,<br>
+            height_shift_range=0.1,<br>
+            horizontal_flip=True,<br>
+            vertical_flip=True,<br>
+            preprocessing_function=preprocess_input)
+        </code>
+    </div>
+
+    <div class="section">
+        <h2>2. Data Augmentation</h2>
+        <p>Data augmentation techniques, such as rotation, zoom, and flipping, are applied to the training and validation datasets to help the model generalize better to unseen images.</p>
+
+        <code>
+            valid_datagen = ImageDataGenerator(    
+            rotation_range=20,<br>
+            zoom_range=0.2,<br>
+            width_shift_range=0.1,<br>
+            height_shift_range=0.1,<br>
+            horizontal_flip=True,<br>
+            vertical_flip=True,<br>
+            preprocessing_function=preprocess_input)
+        </code>
+
+        <p>Both the training and validation datasets are fed into the model using generators, which load batches of images and apply the transformations in real-time.</p>
+
+        <code>
+            train_generator = train_datagen.flow_from_directory(  
+            train_dir,<br>
+            target_size=(width_shape, height_shape),<br>
+            batch_size=batch_size,<br>
+            class_mode='categorical')<br><br>
+            
+            validation_generator = valid_datagen.flow_from_directory(  
+            validation_dir,<br>
+            target_size=(width_shape, height_shape),<br>
+            batch_size=batch_size,<br>
+            class_mode='categorical')
+        </code>
+    </div>
+
+    <div class="section">
+        <h2>3. Model Training</h2>
+        <p>The ResNet-50 model is trained on the augmented dataset for 70 epochs with a batch size of 64. The training process also includes validation at each epoch to monitor the model's performance on unseen data.</p>
+        <p>The first graph below illustrates the loss during training and validation over the course of 70 epochs. We can observe that the model's training loss (in red) decreases steadily, while the validation loss (in blue) also follows a downward trend, showing that the model is generalizing well.</p>
+
+    <img src="images/image11.png" alt="Training and Validation Loss Graph" width="600">
+
+        <p>The second graph shows the accuracy trend during the training process. The red line represents training accuracy, and the blue line shows validation accuracy. Both lines indicate that the model is improving over time, though the validation accuracy fluctuates a little more, suggesting some variance in generalization.</p>
+
+    <img src="images/image12.png" alt="Training and Validation Accuracy Graph" width="600">
+        <code>
+            m_Resnet50 = ResNet50(input_tensor=image_input, include_top=False, weights='imagenet')<br><br>
+
+            epochs = 70<br>
+            model_history = custom_model.fit_generator(  
+            train_generator,<br>
+            epochs=epochs,<br>
+            validation_data=validation_generator,<br>
+            steps_per_epoch=nb_train_samples//batch_size,<br>
+            validation_steps=nb_validation_samples//batch_size)
+        </code>
+    </div>
+
+    <div class="section">
+        <h2>4. Prediction and Evaluation</h2>
+        <p>Once trained, the model is used to predict the poverty category of the input satellite images. The <strong>Predicccion_y_evaluacion</strong> script generates predictions and evaluates the model performance using a confusion matrix.</p>
+
+        <ul class="tech-list">
+            <li><strong>Technologies:</strong></li>
+            <li><strong>Confusion Matrix:</strong> For evaluating model accuracy and classification performance.</li>
+            <li><strong>Jupyter Notebook:</strong> Used for running the prediction script and displaying results.</li>
+            <li><strong>tkinter:</strong> For displaying the prediction category and whether the image is rural or urban.</li>
+        </ul>
+    </div>
+
+    <div class="section">
+        <h2>5. Visualizing Filters</h2>
+        <p>The <strong>Visualize_filters</strong> script (currently in progress) loads the trained model and visualizes how the image changes as it passes through the layers of ResNet. This helps in understanding what features the model is learning at different stages.</p>
+    </div>
+
+    <div class="section">
+        <h2>Technologies Summary</h2>
+        <ul class="tech-list">
+            <li><strong>Languages/Frameworks:</strong> Python (TensorFlow/Keras, Tkinter, Jupyter Notebook)</li>
+            <li><strong>Deep Learning Model:</strong> ResNet-50</li>
+            <li><strong>Environment:</strong> Google Colab, Jupyter Notebook</li>
+            <li><strong>Data Augmentation:</strong> ImageDataGenerator (Keras)</li>
+        </ul>
+    </div>
+
+</body>
+</html>
