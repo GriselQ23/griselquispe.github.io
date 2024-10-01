@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Credit Card Approval Automation - Using Support Vector Machines (SVM)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-left: 3px solid #ddd;
+            overflow-x: auto;
+        }
+        img {
+            display: block;
+            margin: 20px auto;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Credit Card Approval Automation using Support Vector Machines</h1>
+    </header>
+
+    <section>
+        <h2>Introduction</h2>
+        <p>This project aims to automate the credit card approval process by using machine learning, specifically Support Vector Machine (SVM) algorithms, which are highly effective in classification problems. The dataset used in this project contains various features related to applicants' personal and financial details, and the goal is to predict whether a credit card application will be approved.</p>
+        <p>The entire process is divided into data preprocessing, training, and evaluation stages, leading to a fully functional 
+            model for credit card approval automation. You can find the report <a href="images/Project_machine_learning_Fundamentals.pdf " download style="color: blue;">here</a></p>
+    </section>
+
+    <section>
+        <h2>Dataset Overview</h2>
+        <p>The dataset consists of personal and financial features related to credit card applicants, such as:</p>
+        <ul>
+            <li><strong>Categorical Features:</strong> Industry, Ethnicity, Citizen</li>
+            <li><strong>Numerical Features:</strong> Credit Score, Years Employed, Income, Debt, Age</li>
+            <li><strong>Target Variable:</strong> Approved (Yes/No)</li>
+        </ul>
+        <p>Our goal is to build a predictive model to classify whether an applicant will be approved based on these features.</p>
+    </section>
+
+    <section>
+        <h2>1. Data Preprocessing</h2>
+        <p>Data preprocessing is critical to ensure that our model works with clean and well-formatted data. The steps include encoding categorical features, scaling numerical features, and selecting the most important features based on their impact on the target variable.</p>
+
+        <h3>Key Preprocessing Steps:</h3>
+        <ul>
+            <li><strong>One-Hot Encoding:</strong> Converts categorical variables (like Industry, Ethnicity, and Citizen) into binary format.</li>
+            <li><strong>Feature Importance:</strong> Identifies the most relevant features using a Random Forest model.</li>
+            <li><strong>Scaling:</strong> Numerical features like Credit Score, Years Employed, Income, Debt, and Age are scaled using logarithmic transformation and Min-Max scaling.</li>
+        </ul>
+
+        <h3>Code Example for Preprocessing:</h3>
+        <pre>
+class DataPreprocessing:
+    def __init__(self, dataset_path):
+        self.dataset_path = dataset_path
+    
+    def preprocess_data(self):
+        df = pd.read_csv(self.dataset_path)
+        df_encoded = self.OneHotEncoder_features(df)
+        df_features = self.feature_importance(df_encoded)
+        df_refined = self.select_features(df_encoded)
+        df_scaled = self.scaling(df_refined) 
+        features = df_scaled.columns.tolist()
+        return(features, df_scaled)
+        </pre>
+
+        <h3>Feature Importance Visualization:</h3>
+        <img src="images/image13.PNG" alt="Feature Importance Plot" width="200">
+
+        <p>The feature importance chart shows which features have the most significant influence on the credit card approval process. Features such as 'Prior Default', 'Credit Score', and 'Years Employed' play key roles in the prediction process.</p>
+    </section>
+
+    <section>
+        <h2>2. Training the SVM Model</h2>
+        <p>We used the Support Vector Machine (SVM) algorithm to classify applicants into approved and non-approved categories. SVM is ideal for this task because of its robustness in handling binary classification problems.</p>
+        <p>We implemented cross-validation to find the best hyperparameters (C, kernel, gamma) for the SVM model, ensuring that the model generalizes well to new data. Grid Search was used to fine-tune these hyperparameters.</p>
+
+        <h3>Code Example for Model Training:</h3>
+        <pre>
+class Training: 
+    def training_process(self):
+        df = self.data
+        mean_cv_score, X_train, X_test, y_train, y_test = self.cross_validation(df)
+        best_parameters, best_score, y_pred = self.linear(X_train, y_train, X_test, y_test)
+        print('The best parameters are:', best_parameters, 'The best score is', best_score)
+        return(X_train, X_test, y_test, y_pred)
+        
+    def cross_validation(self, df): 
+        X = df.drop('Approved', axis=1)
+        y = df['Approved']
+        svm_baseline = SVC(random_state=42)
+        cv_scores = cross_val_score(svm_baseline, X_train, y_train, cv=5)
+        return(cv_scores.mean(), X_train, X_test, y_train, y_test)
+        </pre>
+
+        <h3>Cross-Validation & Hyperparameter Tuning:</h3>
+        <img src="images/image14.PNG" alt="SVM Cross Validation Plot" width="600">
+
+        <p>The above figure shows the cross-validation results and optimal parameters for the SVM model, leading to improved accuracy in predictions.</p>
+    </section>
+
+    <section>
+        <h2>3. Model Evaluation</h2>
+        <p>After training the SVM model, we evaluated its performance using metrics such as Accuracy, Precision, Recall, F1 Score, and the ROC-AUC score. These metrics are vital to understand how well the model performs in classifying approved vs. non-approved applications.</p>
+
+        <h3>Code Example for Evaluation:</h3>
+        <pre>
+class Evaluation:
+    def metrics(self):
+        accuracy = accuracy_score(self.y_test, self.y_pred)
+        precision = precision_score(self.y_test, self.y_pred)
+        recall = recall_score(self.y_test, self.y_pred)
+        f1 = f1_score(self.y_test, self.y_pred)
+        roc_auc = roc_auc_score(self.y_test, self.y_pred)
+        print(classification_report(self.y_test, self.y_pred))
+        return([accuracy, precision, recall, f1, roc_auc])
+        </pre>
+
+        <h3>Performance Metrics Visualization:</h3>
+        <img src="file-path-to-your-metrics-plot.png" alt="Evaluation Metrics Plot" width="600">
+
+        <p>The model achieved an accuracy of 85%, with a precision of 84% and recall of 82%, as indicated by the classification report and performance metrics. The ROC-AUC score indicates that the model is well-calibrated for the binary classification task.</p>
+    </section>
+
+    <section>
+        <h2>Conclusion</h2>
+        <p>This project demonstrates the power of Support Vector Machines in automating the credit card approval process. By carefully preprocessing the data, selecting important features, and tuning hyperparameters, we built a model capable of accurately predicting the approval status of credit card applications. Further improvements can be made by exploring additional models or feature engineering techniques.</p>
+    </section>
+
+</body>
+</html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project: Knowledge Extraction from Textual Data</title>
+    <link rel="stylesheet" href="assets/css/main.css" > <!-- Add your CSS link here -->
+</head>
+<body>
+
+    <header>
+        <h1>Knowledge Extraction from Textual Data</h1>
+    </header>
+
+    <section>
+        <h2>Project Overview</h2>
+        <p> This project focuses on extracting valuable information related to Land Use and Land Cover in Africa from large volumes of scientific 
+            documents using Natural Language Processing (NLP) techniques. The goal is to extract candidates for relevant segments, classify them, and finally 
+            extract specific entities and analyze them. You can find the report <a href="images/Report_Internship.pdf " download style="color: blue;">here</a> and the code 
+            <a href="https://github.com/GriselQ23/NLPinternship-TETIS-HSM" target="_blank" style="color: blue;">here</a>.
+        </p>
+        <!-- Add more detailed project description here -->
+    </section>
+    <section>
+        <h3>PDF Conversion</h2>
+        <p>The first step is to transform the documents into text format. In our case, we are interested in the title, abstract, and body. To reduce noise, 
+            we use GROBID, a pretrained model, to extract the text in a hierarchical way, converting it into an XML format. </p>
+            <a href="#" class="image fit">
+                <img src="images/image8.png" alt="" style="width: 300px; height: auto;" />
+            </a>
+        <!-- Add more detailed project description here -->
+    </section>
+    <section>
+        <h3>Spliting sentences</h2>
+        <p>For this segmentation, we utilized the Regular Expression library in Python (<strong>Regex</strong>), using sequences of periods followed by spaces as 
+            delimiters.
+        </p>
+        <!-- Add more detailed project description here -->
+    </section>
+    <section>
+        <h3>Classification</h2>
+        <p>The dataset was manual labeled into 3 clases. To classify the unlabel dataset we used a schema by rounds and we try several models like SVM/Bag of Words and BERT. 
+        </p>
+        <a href="#" class="image fit">
+            <img src="images/image9.png" alt="" style="width: 300px; height: auto;" />
+        </a>
+        <!-- Add more detailed project description here -->
+    </section>
+    <section>
+        <h3>Metrics</h2>
+        <p>The project was focus in not lose information, so we were intersted in a good precision for class 0 because this was the one we were not interested at all,
+            and a good recall for class 1 and class 2. 
+        </p>
+        <a href="#" class="image fit">
+            <img src="images/image10.png" alt="" style="width: 300px; height: auto;" />
+        </a>
+        <!-- Add more detailed project description here -->
+    </section>
+    <section>
+        <h3>Information Extraction</h2>
+        <p>
+
+            We used **<strong>Information Extraction (IE)</strong>** to convert unstructured text into a structured format for better analysis. A key technique 
+            is **<strong>Named Entity Recognition (NER)</strong>**, which identifies and categorizes important entities related to LULC dynamics, such as measurements,
+             directions, dates, and locations. For NER implementation, we used the **<strong>SpaCy NLP library</strong>**, along with **<strong>Regex</strong>** 
+             and **<strong>Entity Ruler</strong>**, to refine the extraction process and capture both quantitative and qualitative data essential for analyzing LULC 
+             changes.
+        </p>
+
+        <!-- Add more detailed project description here -->
+    </section>
+
+    <footer>
+        <a href="index.html">Back to portfolio</a>
+    </footer>
+
+</body>
+</html>

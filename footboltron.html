@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>Football Table Robot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        code {
+            background-color: #f9f9f9;
+            padding: 5px;
+            display: block;
+            margin: 10px 0;
+            border-left: 4px solid #ccc;
+            font-size: 14px;
+        }
+        .section {
+            margin-bottom: 30px;
+        }
+        .tech-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .tech-list li {
+            background-color: #e7f3ff;
+            padding: 5px;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Football Table Robot: Camera-Controlled AI Opponent</h1>
+    <p>This project aims to develop a robot that can play table football against a human. It uses a camera as a sensor to detect 
+        the ball's and players' positions on the table. Based on the detected positions, the robot sends signals to motors, 
+        which control the movements of the robot players. You can find the full code <a href="https://github.com/GriselQ23/futboltron/blob/master/FKPVision.py" style="color: blue;" target="_blank">here</a></p>.
+
+    <div class="section">
+        <h2>1. Setup and Libraries</h2>
+        <ul class="tech-list">
+            <li><strong>Technologies:</strong></li>
+            <li><strong>OpenCV (cv2):</strong> For image processing and ball/player detection.</li>
+            <li><strong>NumPy (np):</strong> Used for matrix manipulations and data handling.</li>
+            <li><strong>ROS (Robot Operating System):</strong> For communication between components (e.g., sending motor commands to move robot players).</li>
+        </ul>
+
+        <code>
+            captura = cv2.VideoCapture(2)  # Camera setup<br>
+            data = np.zeros((muestras, 2))  # Data collection for ball/player positions<br>
+            jugadores = np.zeros([20,4])    # Matrix for player positions
+        </code>
+    </div>
+
+    <div class="section">
+        <h2>2. Player and Ball Detection</h2>
+        <p>The camera captures the playing field, converting images to the HSV color space to track the positions of the ball and players.</p>
+        <ul class="tech-list">
+            <li><strong>Ball Detection:</strong> Identified by a green mask.</li>
+            <li><strong>Player Detection:</strong> Uses color masks to detect the position of different players.</li>
+        </ul>
+        <p><strong>Technologies:</strong> Kalman Filter predicts the ball's trajectory.</p>
+        
+        <code>
+            kfObj = KalmanFilter()  # Initialize Kalman filter<br>
+            hsv = cv2.cvtColor(imagen, cv2.COLOR_BGR2HSV)  # Convert image to HSV<br>
+            verde_bajos = np.array([74,55,67], dtype=np.uint8)  # Ball color range
+        </code>
+    </div>
+
+    <div class="section">
+        <h2>3. Control System: Motor Commands</h2>
+        <p>Based on the detected positions of the ball and players, the system sends signals to control the robot’s motors through ROS publishers.</p>
+        <ul class="tech-list">
+            <li><strong>Publishing Motor Commands:</strong></li>
+            <li>Goalkeeper (<code>PubArquero</code>)</li>
+            <li>Defenders (<code>PubDefensas</code>)</li>
+            <li>Midfielders (<code>PubMedios</code>)</li>
+            <li>Attackers (<code>PubDelanteros</code>)</li>
+        </ul>
+
+        <code>
+            PubArquero = rospy.Publisher("/Arquero", Quaternion, queue_size=20)<br>
+            PubDefensas = rospy.Publisher("/Defensas", Twist, queue_size=20)<br>
+            PubMedios = rospy.Publisher("/Medios", Quaternion, queue_size=20)<br>
+            PubDelanteros = rospy.Publisher("/Delanteros", Quaternion, queue_size=20)
+        </code>
+
+        <p><strong>ROS Messaging:</strong> Quaternions and Twist messages are used to represent positions and movements.</p>
+    </div>
+
+    <div class="section">
+        <h2>4. Prediction and Player Movement</h2>
+        <p>The Kalman filter predicts the future position of the ball, allowing the robot to react faster and more accurately. The detected positions of the players are used to move them to block or hit the ball.</p>
+
+        <code>
+            predictedCoords = kfObj.Estimate(x1, y1)<br>
+            cv2.circle(imagen, (predictedCoords[0], predictedCoords[1]), 10, [0,255,255], 2)
+        </code>
+    </div>
+
+    <div class="section">
+        <h2>5. Visualization</h2>
+        <p>The system visualizes the game by drawing rectangles around the detected players and circles around the ball, displaying both real-time and predicted positions.</p>
+
+        <code>
+            cv2.putText(imagen, "x=" + str(x1), (x1, y1 + 20), font, sletter, (255, 255, 255), 2, cv2.LINE_AA)<br>
+            cv2.imshow("original", imagen)
+        </code>
+    </div>
+
+    <div class="section">
+        <h2>Technologies Summary</h2>
+        <ul class="tech-list">
+            <li><strong>Languages/Frameworks:</strong> Python (OpenCV, NumPy, ROS)</li>
+            <li><strong>Algorithms:</strong> Kalman Filter for prediction</li>
+            <li><strong>Hardware:</strong> Camera as the sensor, Motors controlled via ROS commands</li>
+        </ul>
+    </div>
+
+</body>
+</html>
